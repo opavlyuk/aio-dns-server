@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from dnslib import RCODE, DNSRecord
+from dnslib import RCODE, DNSRecord, RR
 
 from aio_dns_server.client import send_dns_request
 
@@ -11,31 +11,22 @@ class AbstractBaseResolver(ABC):
         return
 
 
-def block_type(handler):
-    
-
-@block_type('first')(block)
-def block(self):
-    pass
-
-block_type
-
-
 class PyHoleResolver(AbstractBaseResolver):
-    block_types = {}
-
-    def __init__(self, upstream_addr, upstream_port=53, black_list=None, filter_func=qname.matchGlob):
+    def __init__(self, upstream_addr, upstream_port=53, black_list=None, filter_func=None):
         self.black_list = black_list if black_list is not None else []
         self.upstream_addr = upstream_addr
         self.upstream_port = upstream_port
         self.filter_func = filter_func
 
-
     async def resolve(self, request):
         reply = request.reply()
+        qname = request.q.qname
+        filter_func = lambda _, record: qname.matchGlob(record) if self.filter_func is None else self.filter_func
 
-        if any([self.filter_func(record) for record in self.black_list]):
-            reply.header.rcode = getattr(RCODE, 'NXDOMAIN')
+        if any([filter_func(record) for record in self.black_list]):
+            reply
+            reply.add_answer(*RR.fromZone(f'{qname} 2 A 0.0.0.0'))
+            reply.add_answer(*RR.fromZone(f'{qname} 2 AAAA ::'))
             return reply
 
         try:
