@@ -27,7 +27,7 @@ class DNSDatagramProtocol(asyncio.DatagramProtocol):
 
 
 class DNSServer:
-    def __init__(self, resolver, address="0.0.0.0", port=53, protocol=None):
+    def __init__(self, resolver, address="192.168.31.177", port=53, protocol=None):
         self.protocol = protocol
         self.address = address
         self.port = port
