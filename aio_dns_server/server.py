@@ -18,11 +18,9 @@ class DNSDatagramProtocol(asyncio.DatagramProtocol):
 
     async def handle_datagram(self, data, addr):
         request = DNSRecord.parse(data)
-        print(f'request {request.q.qname}')
         reply = await self.resolver.resolve(request)
         if reply is not None:
             self.transport.sendto(reply.pack(), addr)
-        print(f'reply {request.q.qname}')
 
 
 class DNSServer:

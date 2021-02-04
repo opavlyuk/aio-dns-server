@@ -21,9 +21,9 @@ class PyHoleResolver(AbstractBaseResolver):
     async def resolve(self, request):
         reply = request.reply()
         qname = request.q.qname
-        filter_func = lambda _, record: qname.matchGlob(record) if self.filter_func is None else self.filter_func
+        filter_func = lambda record: qname.matchGlob(record) if self.filter_func is None else self.filter_func
 
-        if any([filter_func(record) for record in self.black_list]):
+        if any([filter_func(record) for record in ('*ukr.net*',)]):
             reply
             reply.add_answer(*RR.fromZone(f'{qname} 2 A 0.0.0.0'))
             reply.add_answer(*RR.fromZone(f'{qname} 2 AAAA ::'))
