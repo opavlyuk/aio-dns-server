@@ -24,21 +24,36 @@ class DNSDatagramProtocol(asyncio.DatagramProtocol):
 
 
 class DNSServer:
-    def __init__(self, resolver, protocol, address="0.0.0.0", port=53):
+    def __init__(self, resolver, protocol, address="0.0.0.0", port=53, loop=None):
         self.protocol = protocol
         self.address = address
         self.port = port
         self.transport_inst = None
         self.protocol_inst = None
         self.resolver = resolver
+        self.server_task = None
+        self.loop = loop or asyncio.get_running_loop()
 
-    async def start(self):
-        loop = asyncio.get_running_loop()
-        self.transport_inst, self.protocol_inst = await loop.create_datagram_endpoint(
+    async def _run_dns(self):
+        self.transport_inst, self.protocol_inst = await self.loop.create_datagram_endpoint(
             lambda: self.protocol(self.resolver),
             local_addr=(self.address, self.port),
             reuse_port=True,
         )
 
+    async def start(self):
+        self.server_task = self.loop.create_task(self._run_dns())
+
     async def stop(self):
         self.transport_inst.close()
+
+        if self.server_task:
+            if self.server_task.done() and not self.server_task.cancelled():
+                raise self.server_task.exception()
+            else:
+                self.server_task.cancel()
+                try:
+                    await self.server_task
+                except asyncio.CancelledError:
+                    pass
+
