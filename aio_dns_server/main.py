@@ -10,11 +10,12 @@ async def launcher():
     upstream_dns = config['main']['upstream_dns_addr']
     upstream_port = config['main']['upstream_dns_port']
     block_list = BlockList(config['main']['block_list'])
-    resolver = PyHoleResolver(upstream_dns, block_list=block_list)
+    resolver = PyHoleResolver(upstream_dns, upstream_port, block_list=block_list)
     server = DNSServer(address=config['main']['address'], port=config['main']['port'],
                        resolver=resolver, protocol=DNSDatagramProtocol)
     await server.start()
-    await asyncio.sleep(3600)  # Serve for 1 hour.
+    # await asyncio.sleep(3600)  # Serve for 1 hour.
 
 
-asyncio.run(launcher())
+def main():
+    asyncio.run(launcher())
