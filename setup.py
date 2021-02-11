@@ -6,7 +6,7 @@ setup(
     version="0.0.1",
     author="Oleksandr Pavliuk",
     author_email="pavlyuk.olexandr@gmail.com",
-    python_requires=">=3.9",
+    python_requires=">=3.7",
     install_requires=[
         "dnslib",
         "PyYAML",

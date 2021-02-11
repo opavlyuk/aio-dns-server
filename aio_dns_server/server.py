@@ -31,29 +31,14 @@ class DNSServer:
         self.transport_inst = None
         self.protocol_inst = None
         self.resolver = resolver
-        self.server_task = None
         self.loop = loop or asyncio.get_running_loop()
 
-    async def _run_dns(self):
+    async def start(self):
         self.transport_inst, self.protocol_inst = await self.loop.create_datagram_endpoint(
             lambda: self.protocol(self.resolver),
             local_addr=(self.address, self.port),
             reuse_port=True,
         )
 
-    async def start(self):
-        self.server_task = self.loop.create_task(self._run_dns())
-
-    async def stop(self):
+    def stop(self):
         self.transport_inst.close()
-
-        if self.server_task:
-            if self.server_task.done() and not self.server_task.cancelled():
-                raise self.server_task.exception()
-            else:
-                self.server_task.cancel()
-                try:
-                    await self.server_task
-                except asyncio.CancelledError:
-                    pass
-

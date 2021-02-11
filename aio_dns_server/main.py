@@ -14,8 +14,14 @@ async def launcher():
     server = DNSServer(address=config['main']['address'], port=config['main']['port'],
                        resolver=resolver, protocol=DNSDatagramProtocol)
     await server.start()
-    # await asyncio.sleep(3600)  # Serve for 1 hour.
+    return server
 
 
 def main():
-    asyncio.run(launcher())
+    try:
+        loop = asyncio.get_event_loop()
+        server = loop.run_until_complete(launcher())
+        loop.run_forever()
+    except KeyboardInterrupt:
+        pass
+    server.stop()
