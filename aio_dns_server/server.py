@@ -10,11 +10,9 @@ class DNSDatagramProtocol(asyncio.DatagramProtocol):
         self.transport = None
 
     def connection_made(self, transport):
-        print('Connection made')
         self.transport = transport
 
     def datagram_received(self, data, addr):
-        print('incoming')
         loop = asyncio.get_running_loop()
         loop.create_task(self.handle_datagram(data, addr))
 
@@ -23,11 +21,10 @@ class DNSDatagramProtocol(asyncio.DatagramProtocol):
         reply = await self.resolver.resolve(request)
         if reply is not None:
             self.transport.sendto(reply.pack(), addr)
-        print('outgoing')
 
 
 class DNSServer:
-    def __init__(self, resolver, address="0.0.0.0", port=53, protocol=None):
+    def __init__(self, resolver, protocol, address="0.0.0.0", port=53):
         self.protocol = protocol
         self.address = address
         self.port = port
