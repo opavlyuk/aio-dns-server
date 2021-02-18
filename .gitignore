@@ -139,3 +139,6 @@ cython_debug/
 
 # JetBrains IDE
 .idea/
+
+# Actual config
+config.yml

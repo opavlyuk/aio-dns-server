@@ -1,0 +1,18 @@
+version: '3.3'
+services:
+  mongo:
+    image: mongo
+    command: mongod --dbpath /data/db --noauth
+    ports:
+      - "27017:27017"
+    volumes:
+      - ${PYHOLE_STORAGE}/mongo:/data/db
+
+  pyhole:
+    build: .
+    depends_on:
+      - mongo
+    ports:
+      - "127.0.0.1:53:53"
+    volumes:
+      - ${PYHOLE_STORAGE}/block_lists:/tmp/pyhole/block_lists/
