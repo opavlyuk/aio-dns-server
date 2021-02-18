@@ -1,0 +1,6 @@
+main:
+  address: 0.0.0.0
+  port: 5353
+  upstream_dns_addr:
+  upstream_dns_port: 53
+  block_list: /tmp/block_list.txt
